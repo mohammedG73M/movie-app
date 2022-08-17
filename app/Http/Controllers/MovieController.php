@@ -12,7 +12,7 @@ class MovieController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return View
+     * @return view
      */
     public function index()
     {
@@ -31,7 +31,6 @@ class MovieController extends Controller
         $genres = collect($genresArray)->mapWithKeys(function ($genre){
            return [$genre['id'] => $genre['name']];
         });
-        dump($nowPlayingMovies);
 
         return view('index', [
             'popularMovies' => $popularMovies,
@@ -65,11 +64,17 @@ class MovieController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return view
      */
     public function show($id)
     {
-        //
+        $movie = Http::withToken(Config::get('services.tmdb.token'))
+            ->get('https://api.themoviedb.org/3/movie/'. $id . '?append_to_response=credits,videos,images')
+            ->json();
+
+        return view('show', [
+            'movie' => $movie,
+        ]);
     }
 
     /**
